@@ -1,0 +1,419 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["prismaSchemaFolder"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  MANAGER
+  MEMBER
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  IN_REVIEW
+  DONE
+}
+
+enum TaskPriority {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum TaskFamily {
+  THREE_D_DIGITAL
+  VISUAL_CREATIVE
+  PRODUCT_FABRICATION
+  IMMERSIVE
+}
+
+enum TaskType {
+  // 3D & Digital
+  MODEL_3D_CLO3D_DXF
+  MODEL_3D_CLO3D_SCRATCH
+  SCAN_TISSU_3D
+  ANIMATION_3D_UNREAL
+  ANIMATION_3D_IA
+
+  // Visual & Creative
+  SHOOTING_STYLESHOOT
+  PHOTOGRAPHIE_STUDIO
+  CONCEPT_GRAPHIQUE
+  IMAGE_IA
+  MOOD_BOARD
+  RECHERCHE_TENDANCE
+
+  // Product & Fabrication
+  FICHE_TECHNIQUE_IA
+  PROTO_PHYSIQUE
+  BRODERIE
+  SERIGRAPHIE
+  PRINT_ALLOVER
+  DIGITAL_PRINT_MONOLAYER
+
+  // Immersive
+  EXPERIENCE_VR
+  EXPERIENCE_AR
+}
+
+enum SoftwareSkill {
+  CLO3D
+  BLENDER
+  AFTER_EFFECTS
+  UNREAL_ENGINE
+  MIDJOURNEY_IA
+  ADOBE_SUITE
+  ZBРUSH
+  SUBSTANCE_PAINTER
+}
+
+enum ExpertiseDomain {
+  MODELISATION_3D
+  ANIMATION
+  IMPRESSION_TEXTILE
+  BRODERIE
+  PATRONAGE
+  PHOTOGRAPHIE
+  VR_AR
+  DIRECTION_ARTISTIQUE
+}
+
+enum Background {
+  DESIGN_MODE
+  ARTS_APPLIQUES
+  INGENIERIE_TEXTILE
+  INFOGRAPHIE
+  ARCHITECTURE
+  BEAUX_ARTS
+}
+
+enum AbsenceType {
+  CONGE
+  MALADIE
+  FORMATION
+  AUTRE
+}
+
+enum AbsenceStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum PrototypePhase {
+  ESQUISSE
+  PATRONAGE
+  COUPE
+  ASSEMBLAGE
+  LAVAGE
+  QC
+}
+
+enum AlertType {
+  OVERLOAD
+  MISSING_SKILL
+  CRITICAL_DEADLINE
+  BOTTLENECK
+  LEAVE_CONFLICT
+  CASCADE_DELAY
+}
+
+// ─────────────────────────────────────────
+// USER & PROFILE
+// ─────────────────────────────────────────
+
+model User {
+  id             String          @id @default(cuid())
+  email          String          @unique
+  password       String
+  firstName      String
+  lastName       String
+  role           Role            @default(MEMBER)
+  avatar         String?
+  background     Background?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  skills         UserSkill[]
+  expertises     UserExpertise[]
+  absences       Absence[]
+  tasks          Task[]          @relation("AssignedTasks")
+  taskHistory    TaskHistory[]
+  planningBlocks PlanningBlock[]
+  notifications  Notification[]
+  forumPosts     ForumPost[]
+  forumComments  ForumComment[]
+  alerts         Alert[]
+
+  @@map("users")
+}
+
+model UserSkill {
+  id       String        @id @default(cuid())
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   String
+  software SoftwareSkill
+  level    Int           // 1 to 5
+
+  @@unique([userId, software])
+  @@map("user_skills")
+}
+
+model UserExpertise {
+  id     String          @id @default(cuid())
+  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  domain ExpertiseDomain
+
+  @@unique([userId, domain])
+  @@map("user_expertises")
+}
+
+// ─────────────────────────────────────────
+// TASKS
+// ─────────────────────────────────────────
+
+model Task {
+  id             String           @id @default(cuid())
+  title          String
+  description    String?
+  type           TaskType
+  family         TaskFamily
+  priority       TaskPriority     @default(MEDIUM)
+  status         TaskStatus       @default(TODO)
+  deadline       DateTime?
+  isHardDeadline Boolean          @default(false)
+  estimatedMin   Int              // multiples of 30
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  assignedTo     User?            @relation("AssignedTasks", fields: [assignedUserId], references: [id])
+  assignedUserId String?
+
+  blockedBy      TaskDependency[] @relation("BlockedTask")
+  blocks         TaskDependency[] @relation("BlockingTask")
+
+  planningBlocks PlanningBlock[]
+  taskHistory    TaskHistory[]
+  alerts         Alert[]
+
+  @@map("tasks")
+}
+
+model TaskDependency {
+  id             String @id @default(cuid())
+  blockedTask    Task   @relation("BlockedTask", fields: [blockedTaskId], references: [id], onDelete: Cascade)
+  blockedTaskId  String
+  blockingTask   Task   @relation("BlockingTask", fields: [blockingTaskId], references: [id], onDelete: Cascade)
+  blockingTaskId String
+
+  @@unique([blockedTaskId, blockingTaskId])
+  @@map("task_dependencies")
+}
+
+model TaskHistory {
+  id          String   @id @default(cuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  task        Task     @relation(fields: [taskId], references: [id])
+  taskId      String
+  type        TaskType
+  actualMin   Int
+  success     Boolean
+  completedAt DateTime @default(now())
+
+  @@map("task_history")
+}
+
+// ─────────────────────────────────────────
+// PLANNING
+// ─────────────────────────────────────────
+
+model PlanningBlock {
+  id          String   @id @default(cuid())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId      String
+  date        DateTime
+  startTime   DateTime
+  endTime     DateTime
+  durationMin Int
+
+  @@map("planning_blocks")
+}
+
+// ─────────────────────────────────────────
+// ABSENCES & HOLIDAYS
+// ─────────────────────────────────────────
+
+model Absence {
+  id        String        @id @default(cuid())
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  type      AbsenceType
+  status    AbsenceStatus @default(PENDING)
+  startDate DateTime
+  endDate   DateTime
+  note      String?
+  createdAt DateTime      @default(now())
+
+  @@map("absences")
+}
+
+model PublicHoliday {
+  id          String   @id @default(cuid())
+  name        String
+  date        DateTime
+  country     String   @default("TN")
+  isRecurring Boolean  @default(true)
+
+  @@map("public_holidays")
+}
+
+// ─────────────────────────────────────────
+// MOOD BOARDS
+// ─────────────────────────────────────────
+
+model MoodBoard {
+  id         String           @id @default(cuid())
+  title      String
+  collection String?
+  createdAt  DateTime         @default(now())
+
+  colors     MoodBoardColor[]
+  images     MoodBoardImage[]
+
+  @@map("mood_boards")
+}
+
+model MoodBoardColor {
+  id          String    @id @default(cuid())
+  moodBoard   MoodBoard @relation(fields: [moodBoardId], references: [id], onDelete: Cascade)
+  moodBoardId String
+  hex         String
+
+  @@map("mood_board_colors")
+}
+
+model MoodBoardImage {
+  id          String    @id @default(cuid())
+  moodBoard   MoodBoard @relation(fields: [moodBoardId], references: [id], onDelete: Cascade)
+  moodBoardId String
+  url         String
+  caption     String?
+
+  @@map("mood_board_images")
+}
+
+// ─────────────────────────────────────────
+// PROTOTYPING
+// ─────────────────────────────────────────
+
+model Prototype {
+  id           String              @id @default(cuid())
+  name         String
+  collection   String?
+  currentPhase PrototypePhase      @default(ESQUISSE)
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  phases       PrototypePhaseLog[]
+
+  @@map("prototypes")
+}
+
+model PrototypePhaseLog {
+  id          String         @id @default(cuid())
+  prototype   Prototype      @relation(fields: [prototypeId], references: [id], onDelete: Cascade)
+  prototypeId String
+  phase       PrototypePhase
+  completedAt DateTime       @default(now())
+  note        String?
+
+  @@map("prototype_phase_logs")
+}
+
+// ─────────────────────────────────────────
+// ARCHITECTURAL PLANS
+// ─────────────────────────────────────────
+
+model ArchitecturalPlan {
+  id        String   @id @default(cuid())
+  title     String
+  version   Int      @default(1)
+  status    String   @default("EN_COURS")
+  fileUrl   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("architectural_plans")
+}
+
+// ─────────────────────────────────────────
+// FORUM
+// ─────────────────────────────────────────
+
+model ForumPost {
+  id        String         @id @default(cuid())
+  author    User           @relation(fields: [authorId], references: [id])
+  authorId  String
+  title     String
+  content   String
+  likes     Int            @default(0)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  comments  ForumComment[]
+
+  @@map("forum_posts")
+}
+
+model ForumComment {
+  id        String    @id @default(cuid())
+  post      ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  author    User      @relation(fields: [authorId], references: [id])
+  authorId  String
+  content   String
+  createdAt DateTime  @default(now())
+
+  @@map("forum_comments")
+}
+
+// ─────────────────────────────────────────
+// ALERTS & NOTIFICATIONS
+// ─────────────────────────────────────────
+
+model Alert {
+  id        String    @id @default(cuid())
+  type      AlertType
+  message   String
+  isRead    Boolean   @default(false)
+  user      User?     @relation(fields: [userId], references: [id])
+  userId    String?
+  task      Task?     @relation(fields: [taskId], references: [id])
+  taskId    String?
+  createdAt DateTime  @default(now())
+
+  @@map("alerts")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  message   String
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  @@map("notifications")
+}
