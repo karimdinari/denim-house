@@ -42,7 +42,7 @@ denim-house/
 │   ├── prisma/
 │   │   └── schema.prisma            # All models, enums, relations
 │   ├── src/
-│   │   ├── lib/
+│   │   ├── prisma/
 │   │   │   └── prisma.js            # Prisma client instance
 │   │   ├── services/
 │   │   │   ├── auth.service.js      # Register, login, JWT
