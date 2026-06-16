@@ -1,4 +1,5 @@
 import { prisma } from '../lib/prisma.js'
+import { TASK_REQUIREMENTS } from '../constants/task-requirements.js'
 
 export const alertService = {
 
@@ -126,7 +127,6 @@ export const alertService = {
   },
 
   async detectMissingSkills() {
-    const TASK_REQUIREMENTS = (await import('./scoring.service.js')).TASK_REQUIREMENTS
 
     const unassignedTasks = await prisma.task.findMany({
       where: {
