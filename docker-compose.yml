@@ -1,0 +1,26 @@
+version: '3.9'
+
+services:
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: denim_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: denim_user
+      POSTGRES_PASSWORD: denim_pass
+      POSTGRES_DB: denim_house
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: denim_redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+
+volumes:
+  postgres_data:
