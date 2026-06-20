@@ -2,7 +2,7 @@
 // TASK → REQUIRED SKILLS & DOMAINS MAPPING
 // ─────────────────────────────────────────
 
-const TASK_REQUIREMENTS = {
+export const TASK_REQUIREMENTS = {
     MODEL_3D_CLO3D_DXF:       { skills: [{ software: 'CLO3D', minLevel: 3 }],         domains: ['MODELISATION_3D'] },
     MODEL_3D_CLO3D_SCRATCH:   { skills: [{ software: 'CLO3D', minLevel: 4 }],         domains: ['MODELISATION_3D'] },
     SCAN_TISSU_3D:            { skills: [{ software: 'CLO3D', minLevel: 2 }],         domains: ['MODELISATION_3D', 'IMPRESSION_TEXTILE'] },
