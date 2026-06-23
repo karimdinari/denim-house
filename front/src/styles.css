@@ -1,0 +1,154 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@import "@fontsource/inter/300.css";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+@import "@fontsource/eb-garamond/400.css";
+@import "@fontsource/eb-garamond/400-italic.css";
+@import "@fontsource/eb-garamond/600.css";
+@import "@fontsource/eb-garamond/600-italic.css";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/500.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Denim House R&D — atelier design system */
+
+:root {
+  --radius: 0.125rem;
+
+  /* Atelier palette */
+  --canvas: oklch(0.978 0.005 85);          /* #FAF9F6 ecru paper */
+  --canvas-warm: oklch(0.965 0.012 80);     /* slightly warmer */
+  --charcoal: oklch(0.16 0 0);              /* #121212 */
+  --indigo-dye: oklch(0.28 0.08 264);       /* #1B2B48 raw indigo */
+  --indigo-deep: oklch(0.22 0.08 264);
+  --selvedge: oklch(0.55 0.20 27);          /* #BC2131 rivet red */
+  --stitch: oklch(0.72 0.16 60);            /* #D97706 copper thread */
+
+  /* Shadcn-compatible mappings */
+  --background: var(--canvas);
+  --foreground: var(--charcoal);
+  --card: oklch(1 0 0);
+  --card-foreground: var(--charcoal);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--charcoal);
+  --primary: var(--indigo-dye);
+  --primary-foreground: var(--canvas);
+  --secondary: oklch(0.95 0.005 85);
+  --secondary-foreground: var(--charcoal);
+  --muted: oklch(0.94 0.006 85);
+  --muted-foreground: oklch(0.45 0.01 85);
+  --accent: var(--stitch);
+  --accent-foreground: var(--charcoal);
+  --destructive: var(--selvedge);
+  --destructive-foreground: var(--canvas);
+  --border: oklch(0.16 0 0 / 0.1);
+  --input: oklch(0.16 0 0 / 0.12);
+  --ring: var(--indigo-dye);
+
+  --chart-1: var(--indigo-dye);
+  --chart-2: var(--stitch);
+  --chart-3: var(--selvedge);
+  --chart-4: oklch(0.6 0.05 240);
+  --chart-5: oklch(0.7 0.03 85);
+
+  --sidebar: var(--canvas);
+  --sidebar-foreground: var(--charcoal);
+  --sidebar-primary: var(--indigo-dye);
+  --sidebar-primary-foreground: var(--canvas);
+  --sidebar-accent: oklch(0.94 0.006 85);
+  --sidebar-accent-foreground: var(--charcoal);
+  --sidebar-border: oklch(0.16 0 0 / 0.08);
+  --sidebar-ring: var(--indigo-dye);
+}
+
+.dark {
+  --background: var(--indigo-deep);
+  --foreground: var(--canvas);
+  --card: oklch(0.25 0.06 264);
+  --card-foreground: var(--canvas);
+  --primary: var(--canvas);
+  --primary-foreground: var(--indigo-dye);
+  --border: oklch(1 0 0 / 0.1);
+}
+
+@theme inline {
+  --radius-sm: var(--radius);
+  --radius-md: calc(var(--radius) + 2px);
+  --radius-lg: calc(var(--radius) + 4px);
+  --radius-xl: calc(var(--radius) + 8px);
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "EB Garamond", ui-serif, Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --color-canvas: var(--canvas);
+  --color-canvas-warm: var(--canvas-warm);
+  --color-charcoal: var(--charcoal);
+  --color-indigo-dye: var(--indigo-dye);
+  --color-indigo-deep: var(--indigo-deep);
+  --color-selvedge: var(--selvedge);
+  --color-stitch: var(--stitch);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@utility pattern-grid {
+  background-image: radial-gradient(circle, color-mix(in oklab, var(--charcoal) 12%, transparent) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+@utility stitched {
+  background-image: repeating-linear-gradient(90deg, currentColor 0 6px, transparent 6px 12px);
+}
+
+@utility stitched-y {
+  background-image: repeating-linear-gradient(0deg, currentColor 0 6px, transparent 6px 12px);
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+  }
+  ::selection { background: var(--indigo-dye); color: var(--canvas); }
+}
