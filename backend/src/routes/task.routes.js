@@ -9,6 +9,7 @@ router.use(authenticate)
 
 // Utility routes (before /:id to avoid param conflicts)
 router.get('/blocked', taskController.getBlocked)
+router.get('/my', taskController.getMyTasks)
 
 router.get('/',    taskController.getAll)
 router.get('/:id', taskController.getById)

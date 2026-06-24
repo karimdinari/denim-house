@@ -14,6 +14,8 @@ import { Route as PrototypingRouteImport } from './routes/prototyping'
 import { Route as PlanningRouteImport } from './routes/planning'
 import { Route as MoodboardRouteImport } from './routes/moodboard'
 import { Route as MembersRouteImport } from './routes/members'
+import { Route as MemberRouteImport } from './routes/member'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
 
 const TasksRoute = TasksRouteImport.update({
@@ -41,6 +43,16 @@ const MembersRoute = MembersRouteImport.update({
   path: '/members',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MemberRoute = MemberRouteImport.update({
+  id: '/member',
+  path: '/member',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -49,6 +61,8 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/member': typeof MemberRoute
   '/members': typeof MembersRoute
   '/moodboard': typeof MoodboardRoute
   '/planning': typeof PlanningRoute
@@ -57,6 +71,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/member': typeof MemberRoute
   '/members': typeof MembersRoute
   '/moodboard': typeof MoodboardRoute
   '/planning': typeof PlanningRoute
@@ -66,6 +82,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/member': typeof MemberRoute
   '/members': typeof MembersRoute
   '/moodboard': typeof MoodboardRoute
   '/planning': typeof PlanningRoute
@@ -76,16 +94,28 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/login'
+    | '/member'
     | '/members'
     | '/moodboard'
     | '/planning'
     | '/prototyping'
     | '/tasks'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/members' | '/moodboard' | '/planning' | '/prototyping' | '/tasks'
+  to:
+    | '/'
+    | '/login'
+    | '/member'
+    | '/members'
+    | '/moodboard'
+    | '/planning'
+    | '/prototyping'
+    | '/tasks'
   id:
     | '__root__'
     | '/'
+    | '/login'
+    | '/member'
     | '/members'
     | '/moodboard'
     | '/planning'
@@ -95,6 +125,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LoginRoute: typeof LoginRoute
+  MemberRoute: typeof MemberRoute
   MembersRoute: typeof MembersRoute
   MoodboardRoute: typeof MoodboardRoute
   PlanningRoute: typeof PlanningRoute
@@ -139,6 +171,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MembersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/member': {
+      id: '/member'
+      path: '/member'
+      fullPath: '/member'
+      preLoaderRoute: typeof MemberRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -151,6 +197,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LoginRoute: LoginRoute,
+  MemberRoute: MemberRoute,
   MembersRoute: MembersRoute,
   MoodboardRoute: MoodboardRoute,
   PlanningRoute: PlanningRoute,
@@ -160,3 +208,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

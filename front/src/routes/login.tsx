@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
-import { ApiError } from "@/lib/api";
+import { ApiError, apiClient } from "@/lib/api";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/login")({
@@ -30,7 +30,13 @@ function LoginPage() {
     try {
       await login(email, password);
       toast.success("Welcome back");
-      navigate({ to: "/" });
+      // Redirect based on role
+      const { user } = await apiClient.me();
+      if (user.role === "MANAGER") {
+        navigate({ to: "/" });
+      } else {
+        navigate({ to: "/member" });
+      }
     } catch (err) {
       const msg = err instanceof ApiError ? err.message : "Login failed";
       toast.error(msg);

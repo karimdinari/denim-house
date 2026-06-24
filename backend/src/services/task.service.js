@@ -172,5 +172,26 @@ export const taskService = {
     return dependencies
       .filter(d => d.blockingTask.status !== 'DONE')
       .map(d => d.blockedTask)
+  },
+
+  async getMyTasks(userId) {
+    return prisma.task.findMany({
+      where: { assignedUserId: userId },
+      include: {
+        assignedTo: {
+          select: { id: true, firstName: true, lastName: true, avatar: true }
+        },
+        blockedBy: {
+          include: {
+            blockingTask: { select: { id: true, title: true, status: true } }
+          }
+        },
+      },
+      orderBy: [
+        { priority: 'asc' },
+        { deadline: 'asc' },
+        { createdAt: 'desc' }
+      ]
+    })
   }
 }

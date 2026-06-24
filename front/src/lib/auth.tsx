@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { apiClient, setToken, getToken } from "./api";
+import { connectSocket, disconnectSocket } from "./socket";
 import type { User } from "./types";
 
 interface AuthContextValue {
@@ -43,17 +44,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     loadUser();
+    // Reconnect socket if user is already logged in
+    const token = getToken();
+    if (token) {
+      connectSocket();
+    }
   }, [loadUser]);
 
   const login = useCallback(async (email: string, password: string) => {
     const { user: loggedIn, token } = await apiClient.login(email, password);
     setToken(token);
     setUser(loggedIn);
+    connectSocket();
   }, []);
 
   const logout = useCallback(() => {
     setToken(null);
     setUser(null);
+    disconnectSocket();
   }, []);
 
   const value = useMemo(

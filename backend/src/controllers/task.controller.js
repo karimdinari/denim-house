@@ -89,4 +89,13 @@ export const taskController = {
       res.status(500).json({ error: err.message })
     }
   },
+
+  async getMyTasks(req, res) {
+    try {
+      const tasks = await taskService.getMyTasks(req.user.id)
+      res.json(tasks)
+    } catch (err) {
+      res.status(500).json({ error: err.message })
+    }
+  },
 }

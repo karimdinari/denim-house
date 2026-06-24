@@ -61,6 +61,8 @@ export const apiClient = {
     return api<import("./types").Task[]>(`/api/tasks${qs}`);
   },
 
+  getMyTasks: () => api<import("./types").Task[]>("/api/tasks/my"),
+
   assignTask: (taskId: string, userId: string) =>
     api<import("./types").Task>(`/api/tasks/${taskId}/assign`, {
       method: "POST",
